@@ -1,0 +1,12 @@
+{
+  "name": "farmer-scheme-assistant-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for Farmer Scheme Assistant",
+  "scripts": {
+    "start": "npx -y serve -l 5500 .",
+    "dev": "npx -y serve -l 5500 ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

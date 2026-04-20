@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Login to Farmer Scheme Assistant – Discover government schemes and subsidies."/>
+  <title>Login | Farmer Scheme Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Tamil:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body class="login-body">
+
+  <div class="login-container">
+    <div class="login-hero">
+      <div class="login-hero-content">
+        <span class="login-logo-icon">🌾</span>
+        <h1>Farmer Scheme Assistant</h1>
+        <p>கிசான் திட்ட உதவியாளர்</p>
+        <div class="login-hero-features">
+          <div class="login-feature">🔍 Find Government Schemes</div>
+          <div class="login-feature">🤖 AI Voice Chatbot</div>
+          <div class="login-feature">🗣️ Tamil & English Support</div>
+          <div class="login-feature">💰 Subsidy Calculator</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="login-form-side">
+      <div class="login-card">
+        <div class="login-tabs">
+          <button class="login-tab active" id="loginTab" onclick="switchTab('login')">Login</button>
+          <button class="login-tab" id="registerTab" onclick="switchTab('register')">Register</button>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <form id="loginForm" class="auth-form" onsubmit="handleLogin(event)">
+          <h2>Welcome Back 🙏</h2>
+          <p class="auth-subtitle">Login to access your farmer dashboard</p>
+
+          <div class="form-group">
+            <label for="loginEmail">Email Address</label>
+            <input type="email" id="loginEmail" placeholder="farmer@example.com" required/>
+          </div>
+
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" placeholder="Enter your password" required minlength="4"/>
+          </div>
+
+          <div id="loginError" class="auth-error hidden"></div>
+
+          <button type="submit" class="btn-primary auth-btn" id="loginBtn">
+            <span>🔑</span> Login
+          </button>
+        </form>
+
+        <!-- REGISTER FORM -->
+        <form id="registerForm" class="auth-form hidden" onsubmit="handleRegister(event)">
+          <h2>Create Account 🌱</h2>
+          <p class="auth-subtitle">Register to start finding schemes</p>
+
+          <div class="form-group">
+            <label for="regName">Full Name</label>
+            <input type="text" id="regName" placeholder="e.g. Ramu Krishnan" required/>
+          </div>
+
+          <div class="form-group">
+            <label for="regEmail">Email Address</label>
+            <input type="email" id="regEmail" placeholder="farmer@example.com" required/>
+          </div>
+
+          <div class="form-group">
+            <label for="regPhone">Phone Number</label>
+            <input type="tel" id="regPhone" placeholder="e.g. 9876543210"/>
+          </div>
+
+          <div class="form-group">
+            <label for="regPassword">Password</label>
+            <input type="password" id="regPassword" placeholder="Minimum 4 characters" required minlength="4"/>
+          </div>
+
+          <div id="registerError" class="auth-error hidden"></div>
+          <div id="registerSuccess" class="auth-success hidden"></div>
+
+          <button type="submit" class="btn-primary auth-btn" id="regBtn">
+            <span>📝</span> Create Account
+          </button>
+        </form>
+      </div>
+      <p class="login-footer-text">© 2025 Farmer Scheme Assistant — For Educational Purposes</p>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:3000';
+
+    // Check if already logged in
+    fetch(API_BASE + '/api/me', { credentials: 'include' }).then(r => r.json()).then(data => {
+      if (data.success) window.location.href = '/profile.html';
+    }).catch(() => {});
+
+    function switchTab(tab) {
+      document.getElementById('loginForm').classList.toggle('hidden', tab !== 'login');
+      document.getElementById('registerForm').classList.toggle('hidden', tab !== 'register');
+      document.getElementById('loginTab').classList.toggle('active', tab === 'login');
+      document.getElementById('registerTab').classList.toggle('active', tab === 'register');
+      // Clear errors
+      document.getElementById('loginError').classList.add('hidden');
+      document.getElementById('registerError').classList.add('hidden');
+      document.getElementById('registerSuccess').classList.add('hidden');
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const errEl = document.getElementById('loginError');
+      errEl.classList.add('hidden');
+
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      try {
+        const res = await fetch(API_BASE + '/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          localStorage.setItem('fsa_user', JSON.stringify(data.user));
+          window.location.href = '/profile.html';
+        } else {
+          errEl.textContent = data.error || 'Login failed';
+          errEl.classList.remove('hidden');
+        }
+      } catch (err) {
+        errEl.textContent = 'Server error. Please try again.';
+        errEl.classList.remove('hidden');
+      }
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      const errEl = document.getElementById('registerError');
+      const successEl = document.getElementById('registerSuccess');
+      errEl.classList.add('hidden');
+      successEl.classList.add('hidden');
+
+      const name = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const phone = document.getElementById('regPhone').value.trim();
+      const password = document.getElementById('regPassword').value;
+
+      try {
+        const res = await fetch(API_BASE + '/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ name, email, phone, password })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          localStorage.setItem('fsa_user', JSON.stringify(data.user));
+          window.location.href = '/profile.html';
+        } else {
+          errEl.textContent = data.error || 'Registration failed';
+          errEl.classList.remove('hidden');
+        }
+      } catch (err) {
+        errEl.textContent = 'Server error. Please try again.';
+        errEl.classList.remove('hidden');
+      }
+    }
+  </script>
+</body>
+</html>
