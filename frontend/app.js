@@ -5,7 +5,7 @@
  */
 
 // ── API BASE URL (change this for production deployment) ─────────────────────
-const API_BASE = 'http://localhost:3000';
+const API_BASE = 'https://farmerschemeassistant-1.onrender.com';
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
 let currentLang = localStorage.getItem('fsa_lang') || 'en';
@@ -359,7 +359,7 @@ function evaluateRule(rule, p) {
     if (rule === 'always') return true;
     try {
         const income = p.income, land = p.land, crop = p.crop,
-              state = p.state, age = p.age, category = p.category;
+            state = p.state, age = p.age, category = p.category;
         return eval(rule);
     } catch (_) { return false; }
 }
