@@ -10,6 +10,12 @@ const Farmer = require('./models/Farmer');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5500';
+const isProduction = process.env.NODE_ENV === 'production';
+
+// Trust proxy (needed for Render, Railway, Heroku etc.)
+if (isProduction) {
+  app.set('trust proxy', 1);
+}
 
 // ── MIDDLEWARE ────────────────────────────────────────────────────────────────
 app.use(cors({
@@ -25,8 +31,8 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    sameSite: 'lax',
-    secure: false // set to true in production with HTTPS
+    sameSite: isProduction ? 'none' : 'lax',
+    secure: isProduction // true in production (HTTPS)
   }
 }));
 
